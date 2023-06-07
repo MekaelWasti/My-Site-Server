@@ -17,8 +17,8 @@ from PIL import Image
 
 
 # Data agnostic
-device = "cuda" if torch.cuda.is_available() else "cpu"
-
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cpu"
 
 ### MODEL ###
 
@@ -74,12 +74,21 @@ class LeNet(nn.Module):
 
 
 
-model = LeNet(1,10)
-state_dict = torch.load("HDR.pth", torch.device(device))
-model.load_state_dict(state_dict)
-model = model.to(device)
+# model = LeNet(1,10)
+# state_dict = torch.load("HDR.pth", torch.device(device))
+# model.load_state_dict(state_dict)
+# model = model.to(device)
 
 def HDR(x):
+
+    res = "LES GO"
+
+    model = LeNet(1,10)
+    state_dict = torch.load("HDR.pth", torch.device(device))
+    model.load_state_dict(state_dict)
+    model = model.to(device)
+
+
     print("CALLED HDR")
     x = x.split(",")[1]
     # print(x)
@@ -111,8 +120,12 @@ def HDR(x):
     # plt.imshow(a, cmap="gray")
     # plt.axis("off")
 
-    res = torch.argmax(model(transformed_image.unsqueeze(0).to(device))).item()
+    model.eval()
+    with torch.no_grad():
+        res = torch.argmax(model(transformed_image.unsqueeze(0).to(device))).item()
     print(f'RESULT: {res}')
+
+    # del model
 
     return res
 
